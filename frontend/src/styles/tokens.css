@@ -1,0 +1,56 @@
+:root {
+  --clay: #d97757;
+  --clay-dark: #c46849;
+  --clay-hover: #c6613f;
+  --olive: #788c5d;
+  --sky: #6a9bcc;
+  --focus-blue: #2c84db;
+  --error: #bf4d43;
+
+  --gray-000: #ffffff;
+  --gray-050: #faf9f5;
+  --gray-100: #f5f4ed;
+  --gray-150: #f0eee6;
+  --gray-200: #e8e6dc;
+  --gray-250: #dedcd1;
+  --gray-300: #d1cfc5;
+  --gray-400: #b0aea5;
+  --gray-500: #87867f;
+  --gray-600: #5e5d59;
+  --gray-700: #3d3d3a;
+  --gray-800: #262624;
+  --gray-900: #1a1918;
+  --gray-950: #141413;
+
+  --oe-bg: var(--gray-050);
+  --oe-surface: var(--gray-000);
+  --oe-text: var(--gray-950);
+  --oe-text-secondary: var(--gray-700);
+  --oe-text-muted: var(--gray-500);
+  --oe-border: var(--gray-250);
+  --oe-border-strong: var(--gray-300);
+  --oe-border-light: var(--gray-200);
+  --oe-focus-border: var(--focus-blue);
+  --oe-focus-ring: rgba(44, 132, 219, 0.18);
+  --oe-sidebar-bg: var(--gray-950);
+  --oe-sidebar-text: var(--gray-050);
+  --oe-sidebar-icon: var(--gray-400);
+  --oe-sidebar-active: var(--clay);
+  --oe-success: var(--olive);
+  --oe-info: var(--sky);
+  --oe-danger: var(--error);
+
+  --oe-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --oe-font-display: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --oe-font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --oe-radius-sm: 4px;
+  --oe-radius-md: 8px;
+  --oe-control-height: 34px;
+
+  --ant-color-primary: var(--clay-hover);
+  --ant-color-primary-hover: var(--clay-dark);
+  --ant-color-primary-active: var(--clay-dark);
+  --ant-primary-color: var(--clay-hover);
+  --ant-primary-color-hover: var(--clay-dark);
+  --ant-primary-6: var(--clay-hover);
+}

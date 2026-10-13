@@ -1,0 +1,34 @@
+# dependencies
+node_modules/
+
+# build output
+backend/dist/
+frontend/dist/
+*.tsbuildinfo
+
+# env / secrets
+.env
+.env.local
+backend/.env
+backend/.env.*
+deploy/.env
+!.env.example
+!backend/.env.example
+!deploy/.env.example
+
+# logs
+*.log
+logs/
+
+# os / ide
+.DS_Store
+._*
+.idea/
+.vscode/
+
+# local prisma artifacts
+backend/prisma/*.db
+
+# python
+__pycache__/
+*.pyc

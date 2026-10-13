@@ -1,0 +1,86 @@
+/*
+ * Stampa.
+ *
+ * La stampa dal gestionale avviene in una modale (OrderPrintModal): a video si vede
+ * l'anteprima, in stampa deve finire sulla carta solo il foglio, senza menu, tab o
+ * mascherina della modale. La pagina dedicata /print/order/:id non ha la classe
+ * `oe-printing` sul body, quindi continua a stampare normalmente.
+ */
+
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+@media print {
+  body.oe-printing #app {
+    display: none !important;
+  }
+
+  body.oe-printing {
+    background: #fff !important;
+  }
+
+  body.oe-printing .ant-modal-mask {
+    display: none !important;
+  }
+
+  body.oe-printing .ant-modal-wrap {
+    position: static !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  body.oe-printing .ant-modal {
+    top: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body.oe-printing .ant-modal-content {
+    padding: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body.oe-printing .ant-modal-header,
+  body.oe-printing .ant-modal-footer,
+  body.oe-printing .ant-modal-close,
+  body.oe-printing .oe-print-toolbar {
+    display: none !important;
+  }
+
+  body.oe-printing .ant-modal-body {
+    padding: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  body.oe-printing .oe-print-scroll {
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  body.oe-printing .oe-print-sheet-item {
+    max-width: none !important;
+    margin: 0 !important;
+    break-after: page;
+    page-break-after: always;
+  }
+
+  body.oe-printing .oe-print-sheet-item:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  /* Il bordo della scheda e' solo una cornice a video. */
+  body.oe-printing .sheet {
+    border: 0 !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+  }
+}

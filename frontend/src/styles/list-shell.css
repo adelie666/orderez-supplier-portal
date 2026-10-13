@@ -1,0 +1,572 @@
+/*
+ * List shell styles (orders / reports) - aligned with OrderEZ UI standard.
+ * Structure: bread area (title + actions) > page body > filter card > table card > footer bar.
+ */
+
+.oe-list-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 58px);
+  background: var(--oe-bg);
+}
+
+/* Bread / title area */
+.oe-bread-area {
+  position: sticky;
+  top: 58px;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 12px 24px;
+  background: var(--gray-000);
+  border-bottom: 1px solid var(--oe-border);
+}
+
+.oe-bread-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.oe-bread-title {
+  margin: 0;
+  font-family: var(--oe-font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--oe-text);
+}
+
+.oe-bread-sub {
+  color: var(--oe-text-muted);
+  font-size: 13px;
+}
+
+.oe-bread-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Page body */
+.oe-page-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Area centrale scrollabile: la barra inferiore resta sempre visibile */
+.oe-page-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.oe-main-card {
+  border: 1px solid var(--oe-border);
+  border-radius: 8px;
+  background: var(--oe-surface);
+  overflow: hidden;
+}
+
+/* Filters: 6-column grid */
+.oe-filter-wrap {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--oe-border-light);
+  background: var(--gray-000);
+}
+
+.oe-fline {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.oe-fline + .oe-fline {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--oe-border);
+}
+
+.oe-g--2 {
+  grid-column: span 2;
+}
+
+.oe-g--3 {
+  grid-column: span 3;
+}
+
+.oe-filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/*
+ * Variante con i pulsanti Cerca/Azzera dentro la stessa riga dei filtri:
+ * la traccia finale e' "auto" e i pulsanti restano a filo destro, allineati agli input.
+ */
+.oe-fline--actions {
+  grid-template-columns: repeat(6, minmax(0, 1fr)) auto;
+  align-items: end;
+}
+
+.oe-fline--actions .oe-filter-actions {
+  grid-column: -1;
+  justify-self: end;
+  align-self: end;
+  margin-top: 0;
+  padding-bottom: 0;
+}
+
+.oe-main-card .ant-input,
+.oe-main-card .ant-input-affix-wrapper,
+.oe-main-card .ant-select-selector,
+.oe-main-card .ant-picker {
+  border-radius: 4px !important;
+}
+
+/* Focus = blue (editing), primary = clay (action) */
+.oe-main-card .ant-input-affix-wrapper-focused,
+.oe-main-card .ant-input-affix-wrapper:focus-within,
+.oe-main-card .ant-input:focus,
+.oe-main-card .ant-select-focused .ant-select-selector,
+.oe-main-card .ant-picker-focused {
+  border-color: var(--oe-focus-border) !important;
+  box-shadow: 0 0 0 2px var(--oe-focus-ring) !important;
+}
+
+.oe-field-label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--oe-text-muted);
+  font-size: 12px;
+}
+
+/* Table */
+.oe-list-table .ant-table {
+  background: var(--oe-surface);
+}
+
+.oe-list-table .ant-table-thead > tr > th {
+  background: var(--gray-100) !important;
+  color: var(--oe-text-secondary) !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid var(--oe-border) !important;
+}
+
+.oe-list-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid var(--oe-border-light);
+}
+
+/*
+ * Righe a altezza fissa: il testo lungo viene troncato con ellissi,
+ * cosi' l'altezza riga resta costante (come il gestionale di riferimento).
+ */
+.oe-list-table--compact .ant-table-tbody > tr > td {
+  height: 46px;
+  max-height: 46px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.oe-list-table--compact .ant-table-tbody > tr > td .ant-tag {
+  margin-inline-end: 6px;
+}
+
+/* Zebra: even rows with a light background */
+.oe-list-table--zebra .ant-table-tbody > tr.ant-table-row:nth-child(even) > td,
+.oe-list-table--zebra .ant-table-tbody > tr.ant-table-row:nth-child(even) > td.ant-table-cell-fix-left,
+.oe-list-table--zebra .ant-table-tbody > tr.ant-table-row:nth-child(even) > td.ant-table-cell-fix-right {
+  background: var(--gray-100);
+}
+
+/* Hover / fixed cells always warm gray, never Ant blue */
+.oe-list-table .ant-table-tbody > tr.ant-table-row:hover > td,
+.oe-list-table .ant-table-tbody > tr.ant-table-row:hover > td.ant-table-cell-fix-left,
+.oe-list-table .ant-table-tbody > tr.ant-table-row:hover > td.ant-table-cell-fix-right,
+.oe-list-table .ant-table-tbody > tr.ant-table-row-selected > td {
+  background: var(--gray-150) !important;
+}
+
+.oe-list-table .ant-table-cell-fix-left,
+.oe-list-table .ant-table-cell-fix-right {
+  background: var(--oe-surface);
+}
+
+/* Pinned-column inset shadow (header and body, standard 7.6) */
+.oe-list-table .ant-table-cell-fix-left-last::after {
+  box-shadow: inset 10px 0 8px -8px rgba(0, 0, 0, 0.12);
+}
+
+.oe-list-table .ant-table-cell-fix-right-first::after {
+  box-shadow: inset -10px 0 8px -8px rgba(0, 0, 0, 0.12);
+}
+
+/* Index column: "#" apribile per configurare le colonne visibili */
+.oe-col-index {
+  width: 74px;
+  padding-left: 4px !important;
+  padding-right: 4px !important;
+  text-align: center !important;
+  color: var(--oe-text-muted);
+}
+
+.oe-col-hash {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 7px;
+  border-radius: 5px;
+  color: var(--oe-text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.oe-col-hash:hover {
+  color: var(--oe-primary);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* Ingranaggio nelle barre strumenti (pulsante "Colonne") */
+.oe-gear-icon {
+  font-size: 16px;
+}
+
+/* Actions column 6px horizontal padding (standard 7.5) */
+.oe-col-actions {
+  padding-left: 6px !important;
+  padding-right: 6px !important;
+}
+
+/* Status column: il tag resta dentro la cella e non copre le colonne vicine */
+.oe-list-table .oe-col-status .ant-tag {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+
+/* Colonna Spedizione: tag stato + numero documento ERP */
+.oe-col-ship .ant-tag {
+  margin-right: 6px;
+}
+
+/* Pannello scelta colonne (visibilita' + ordine) */
+.oe-colset {
+  min-width: 264px;
+  max-height: 52vh;
+  overflow: auto;
+}
+
+.oe-colset-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--oe-border-light);
+  color: var(--oe-text-muted);
+  font-size: 12.5px;
+}
+
+.oe-colset-list {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.oe-colset-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+/* Riordino colonne: presa a sinistra, trascinabile con il mouse. */
+.oe-colset-row > .ant-checkbox-wrapper {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.oe-colset-grip {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  color: var(--oe-text-muted);
+  cursor: grab;
+}
+
+.oe-colset-grip:active {
+  cursor: grabbing;
+}
+
+.oe-colset-row.is-dragging {
+  opacity: 0.45;
+}
+
+.oe-colset-row.is-over {
+  box-shadow: inset 0 2px 0 var(--clay-hover);
+}
+
+.oe-colset-row .oe-colset-move {
+  margin-left: auto;
+}
+
+.oe-colset-list .ant-checkbox-wrapper {
+  color: var(--oe-text);
+  font-size: 13px;
+}
+
+.oe-colset-move {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.oe-cell-link {
+  color: var(--clay-hover);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.oe-cell-link:hover {
+  text-decoration: underline;
+}
+
+.oe-cell-main {
+  font-weight: 500;
+  color: var(--oe-text);
+}
+
+.oe-cell-sub {
+  color: var(--oe-text-muted);
+  font-size: 12.5px;
+}
+
+.oe-amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.oe-num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Footer bar: pagination on the right (standard 7.2) */
+.oe-footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* Una sola riga: la paginazione resta a destra, senza andare a capo. */
+  flex-wrap: nowrap;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--oe-border);
+  background: var(--gray-000);
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+/* Zona sinistra della barra: selezione + azioni batch */
+.oe-footer-left {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+/* Zona destra della barra: paginazione */
+.oe-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.oe-footer-selected {
+  color: var(--oe-text-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.oe-footer-bar .oe-footer-total {
+  color: var(--oe-text-muted);
+  font-size: 13px;
+}
+
+/* Barra inferiore su una riga: pulsanti compatti e paginazione piu' stretta. */
+.oe-footer-bar .oe-footer-left > .ant-btn {
+  padding-inline: 5px;
+  font-size: 12.5px;
+}
+
+.oe-footer-bar .oe-footer-left > .ant-checkbox-wrapper,
+.oe-footer-bar .oe-footer-left > .oe-footer-selected {
+  font-size: 12.5px;
+}
+
+.oe-footer-bar .oe-footer-left > .ant-btn > .anticon + span {
+  margin-inline-start: 5px;
+}
+
+.oe-footer-bar .ant-pagination {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  font-size: 12.5px;
+}
+
+.oe-footer-bar .ant-pagination-item,
+.oe-footer-bar .ant-pagination-prev,
+.oe-footer-bar .ant-pagination-next {
+  min-width: 26px;
+  height: 26px;
+  line-height: 24px;
+}
+
+.oe-footer-bar .ant-pagination-item {
+  margin-inline-end: 2px;
+}
+
+.oe-footer-bar .ant-pagination-item a {
+  padding: 0 4px;
+}
+
+.oe-footer-bar .ant-pagination-options {
+  margin-inline-start: 6px;
+}
+
+.oe-footer-bar .ant-pagination-options-size-changer.ant-select {
+  margin-inline-end: 0;
+  width: auto;
+  font-size: 12.5px;
+}
+
+/* Schermi stretti: se davvero non ci sta, la barra va a capo invece di tagliare.
+   Sopra i 1200px resta sempre su una riga. */
+@media (max-width: 1200px) {
+  .oe-footer-bar {
+    flex-wrap: wrap;
+  }
+}
+
+/*
+ * Variante "fill": la pagina non scorre, la card riempie lo spazio disponibile e
+ * solo il corpo tabella scorre. Header fisso e barra orizzontale sempre visibile.
+ */
+.oe-list-page--fill .oe-page-scroll {
+  overflow: hidden;
+}
+
+.oe-list-page--fill .oe-main-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.oe-list-table .ant-table-thead > tr > th {
+  white-space: nowrap;
+}
+
+/* KPI strip (reports) */
+.oe-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.oe-kpi {
+  border: 1px solid var(--oe-border);
+  border-radius: 8px;
+  background: var(--oe-surface);
+  padding: 14px 18px;
+  /* Etichetta e valore sulla stessa riga: niente piu' numero a capo sotto il nome */
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.oe-kpi-label {
+  color: var(--oe-text-muted);
+  font-size: 12.5px;
+}
+
+.oe-kpi-value {
+  font-family: var(--oe-font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--oe-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.oe-kpi-foot {
+  color: var(--oe-text-muted);
+  font-size: 12.5px;
+}
+
+@media (max-width: 1100px) {
+  .oe-fline {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .oe-fline--actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  }
+
+  .oe-kpi-strip {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .oe-bread-area {
+    padding: 10px 14px;
+  }
+
+
+  .oe-page-scroll {
+    padding: 12px 14px;
+  }
+
+
+  .oe-fline {
+    grid-template-columns: 1fr;
+  }
+
+  .oe-g--2,
+  .oe-g--3 {
+    grid-column: span 1;
+  }
+
+  .oe-fline--actions {
+    grid-template-columns: 1fr;
+  }
+
+  .oe-fline--actions .oe-filter-actions {
+    grid-column: 1;
+    justify-self: stretch;
+  }
+}

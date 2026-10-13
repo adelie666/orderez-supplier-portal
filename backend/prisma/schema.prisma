@@ -1,0 +1,217 @@
+// 数据模型 —— 对应《意大利语供应商管理端 · 开发规划》§四 DDL
+// 说明：主键用 Int（文档写 BIGSERIAL），量级足够且避免 BigInt 序列化复杂度。
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// 供应商（从 dhb_supplier_list 同步；supplier_name 为匹配键）
+model Supplier {
+  id              Int      @id @default(autoincrement())
+  erpClientId     String?  @map("erp_client_id") @db.VarChar(64)
+  erpBaseClientId String?  @map("erp_base_client_id") @db.VarChar(64)
+  supplierName    String   @unique @map("supplier_name") @db.VarChar(255)
+  clientNum       String?  @map("client_num") @db.VarChar(64)
+  contact         String?  @db.VarChar(128)
+  mobile          String?  @db.VarChar(64)
+  status          String?  @db.VarChar(8)
+  syncedAt        DateTime @default(now()) @map("synced_at") @db.Timestamptz(3)
+
+  users     User[]
+  orders    Order[]
+  shipments Shipment[]
+
+  @@map("suppliers")
+}
+
+/// 账号（管理员 / 供应商）
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique @db.VarChar(64)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  role         String   @db.VarChar(16) // admin | supplier
+  supplierId   Int?     @map("supplier_id")
+  status       Int      @default(1) @db.SmallInt
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  supplier  Supplier?  @relation(fields: [supplierId], references: [id])
+  shipments Shipment[]
+
+  @@index([supplierId])
+  @@map("users")
+}
+
+/// 商品（价格即 EUR）
+model Product {
+  id               Int      @id @default(autoincrement())
+  // 唯一键的两列都不能可空：Postgres 里 NULL 互不相等，任一为 NULL 时唯一约束不生效
+  erpGoodsId       String   @map("erp_goods_id") @db.VarChar(64)
+  erpOptionsId     String   @default("") @map("erp_options_id") @db.VarChar(64)
+  goodsNum         String?  @map("goods_num") @db.VarChar(64)
+  goodsName        String?  @map("goods_name") @db.VarChar(255)
+  optionsName      String?  @map("options_name") @db.VarChar(255)
+  supplierName     String?  @map("supplier_name") @db.VarChar(255)
+  wholePrice       Decimal? @map("whole_price") @db.Decimal(14, 4)
+  purchasePrice    Decimal? @map("purchase_price") @db.Decimal(14, 4)
+  baseUnits        String?  @map("base_units") @db.VarChar(32)
+  conversionNumber Decimal? @map("conversion_number") @db.Decimal(14, 4)
+  // URL immagine articolo (Dinghuobao goods_picture, host img.dhb168.com)
+  imageUrl         String?  @map("image_url") @db.VarChar(512)
+  raw              Json?
+  syncedAt         DateTime @default(now()) @map("synced_at") @db.Timestamptz(3)
+
+  shipmentItems ShipmentItem[]
+
+  @@unique([erpGoodsId, erpOptionsId])
+  @@index([supplierName])
+  @@map("products")
+}
+
+/// 订单主表（来源 dhb_orders + dhb_orders_list）
+model Order {
+  id               Int      @id @default(autoincrement())
+  erpOrdersId      String   @unique @map("erp_orders_id") @db.VarChar(64)
+  erpOrdersNum     String   @unique @map("erp_orders_num") @db.VarChar(64)
+  supplierId       Int?     @map("supplier_id")
+  supplierName     String?  @map("supplier_name") @db.VarChar(255)
+  clientName       String?  @map("client_name") @db.VarChar(255)
+  clientNum        String?  @map("client_num") @db.VarChar(64)
+  status           String?  @db.VarChar(32)
+  statusName       String?  @map("status_name") @db.VarChar(64)
+  payStatus        String?  @map("pay_status") @db.VarChar(32)
+  payStatusName    String?  @map("pay_status_name") @db.VarChar(64)
+  consignee        String?  @db.VarChar(255)
+  consigneeContact String?  @map("consignee_contact") @db.VarChar(128)
+  consigneePhone   String?  @map("consignee_phone") @db.VarChar(64)
+  consigneeAddress String?  @map("consignee_address")
+  discountTotal    Decimal? @map("discount_total") @db.Decimal(14, 4)
+  freight          Decimal? @db.Decimal(14, 4)
+  erpCreateDate    DateTime? @map("erp_create_date") @db.Timestamptz(3)
+  erpUpdateDate    DateTime? @map("erp_update_date") @db.Timestamptz(3)
+  raw              Json?
+  syncedAt         DateTime @default(now()) @map("synced_at") @db.Timestamptz(3)
+
+  supplier Supplier?    @relation(fields: [supplierId], references: [id])
+  items    OrderItem[]
+  shipments Shipment[]
+
+  @@index([supplierId])
+  @@index([erpCreateDate(sort: Desc)])
+  @@index([status])
+  @@map("orders")
+}
+
+/// 订单明细（来源 dhb_order_detail_goods_list，含 supplier_name）
+model OrderItem {
+  id               Int      @id @default(autoincrement())
+  orderId          Int      @map("order_id")
+  erpOrdersListId  String?  @map("erp_orders_list_id") @db.VarChar(64)
+  erpGoodsId       String?  @map("erp_goods_id") @db.VarChar(64)
+  erpOptionsId     String?  @map("erp_options_id") @db.VarChar(64)
+  goodsNum         String?  @map("goods_num") @db.VarChar(64)
+  goodsName        String?  @map("goods_name") @db.VarChar(255)
+  optionsName      String?  @map("options_name") @db.VarChar(255)
+  supplierName     String?  @map("supplier_name") @db.VarChar(255)
+  ordersNumber     Decimal? @map("orders_number") @db.Decimal(14, 4)
+  ordersPrice      Decimal? @map("orders_price") @db.Decimal(14, 4)
+  actualAmount     Decimal? @map("actual_amount") @db.Decimal(14, 4)
+  baseUnits        String?  @map("base_units") @db.VarChar(32)
+  conversionNumber Decimal? @map("conversion_number") @db.Decimal(14, 4)
+  raw              Json?
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  shipmentItems ShipmentItem[]
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+/// 发货单（本地记录；addAllShips 回写成功后落库）
+model Shipment {
+  id          Int      @id @default(autoincrement())
+  orderId     Int      @map("order_id")
+  supplierId  Int?     @map("supplier_id")
+  erpShipsSn  String?  @map("erp_ships_sn") @db.VarChar(64)
+  shippedAt   DateTime @default(now()) @map("shipped_at") @db.Timestamptz(3)
+  operatorId  Int?     @map("operator_id")
+  status      String   @default("receivedin") @db.VarChar(16) // receivedin | failed
+  consignmentNo   String? @map("consignment_no") @db.VarChar(64)
+  consignmentName String? @map("consignment_name") @db.VarChar(128)
+  // Nota del fornitore alla spedizione: viene inviata a Dinghuobao come consignmentRemark
+  remark          String? @db.VarChar(500)
+  attempts    Int      @default(0) @db.SmallInt
+  lastError   String?  @map("last_error")
+  raw         Json?
+
+  order    Order          @relation(fields: [orderId], references: [id])
+  supplier Supplier?      @relation(fields: [supplierId], references: [id])
+  operator User?          @relation(fields: [operatorId], references: [id])
+  items    ShipmentItem[]
+
+  @@index([orderId])
+  @@index([supplierId])
+  @@index([shippedAt(sort: Desc)])
+  // 一单一发货：DB 层兜住重复发货（配合事务里的行锁）
+  @@unique([orderId])
+  @@map("shipments")
+}
+
+/// 发货明细（报表唯一数据源；进货价快照）
+model ShipmentItem {
+  id            Int      @id @default(autoincrement())
+  shipmentId    Int      @map("shipment_id")
+  orderItemId   Int?     @map("order_item_id")
+  productId     Int?     @map("product_id")
+  erpGoodsId    String?  @map("erp_goods_id") @db.VarChar(64)
+  erpOptionsId  String?  @map("erp_options_id") @db.VarChar(64)
+  goodsNum      String?  @map("goods_num") @db.VarChar(64)
+  goodsName     String?  @map("goods_name") @db.VarChar(255)
+  optionsName   String?  @map("options_name") @db.VarChar(255)
+  baseUnits     String?  @map("base_units") @db.VarChar(32)
+  qtyShipped    Decimal  @map("qty_shipped") @db.Decimal(14, 4)
+  purchasePrice Decimal  @map("purchase_price") @db.Decimal(14, 4)
+  amountEur     Decimal  @map("amount_eur") @db.Decimal(14, 2)
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  product  Product? @relation(fields: [productId], references: [id])
+  orderItem OrderItem? @relation(fields: [orderItemId], references: [id])
+
+  @@index([shipmentId])
+  @@map("shipment_items")
+}
+
+/// 同步日志
+model SyncLog {
+  id        Int      @id @default(autoincrement())
+  type      String?  @db.VarChar(32) // order | product | supplier | ship
+  status    String?  @db.VarChar(16) // ok | fail
+  message   String?
+  payload   Json?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([createdAt(sort: Desc)])
+  @@map("sync_logs")
+}
+
+/// 拉单水位
+model SyncWatermark {
+  key       String   @id @db.VarChar(64)
+  value     DateTime? @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
+
+  @@map("sync_watermark")
+}
+
+/// 系统配置（双凭证）
+model Setting {
+  key   String @id @db.VarChar(64)
+  value String?
+
+  @@map("settings")
+}

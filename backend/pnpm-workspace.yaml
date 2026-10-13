@@ -1,0 +1,22 @@
+# pnpm 工作区配置（后端独立成包）。
+#
+# 下面这几个依赖在安装后需要执行自带的构建脚本：
+#   - prisma / @prisma/client / @prisma/engines  下载引擎并生成 Prisma Client
+#   - @nestjs/core                               安装期打补丁
+#   - msgpackr-extract                           编译 BullMQ 用的可选原生加速模块
+# 显式放行（pnpm 默认不允许依赖跑脚本）。若装完提示 "Ignored build scripts"，
+# 说明这两处名单没生效，重新执行 `pnpm install` 即可。
+allowBuilds:
+  '@nestjs/core': true
+  '@prisma/client': true
+  '@prisma/engines': true
+  msgpackr-extract: true
+  prisma: true
+
+# pnpm 10 沿用的字段名，保留以便旧版本同样放行。
+onlyBuiltDependencies:
+  - '@nestjs/core'
+  - '@prisma/client'
+  - '@prisma/engines'
+  - prisma
+  - msgpackr-extract

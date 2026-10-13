@@ -1,0 +1,111 @@
+# OrderEZ Supplier Portal · 一键部署
+#
+#   cd deploy
+#   cp .env.example .env      # 改掉里面的密码与密钥
+#   docker compose up -d --build
+#
+# 起好后访问 http://<服务器IP>:8080（端口由 .env 的 HTTP_PORT 决定）。
+# 首次部署需要建管理员账号，见本文件末尾注释。
+
+name: orderez-supplier-portal
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-orderez_supplier}
+      POSTGRES_USER: ${POSTGRES_USER:-orderez}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?请在 deploy/.env 里设置 POSTGRES_PASSWORD}
+      # 中文/意大利语数据排序，显式指定避免随镜像默认值变化
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    # 数据库不对外暴露。想用本机 psql 连进去调试时，取消下面两行注释。
+    # ports:
+    #   - "127.0.0.1:5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # 发货回写重试队列：数据都在 Postgres 里，Redis 只做队列，关掉持久化
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+
+  backend:
+    build:
+      context: ..
+      dockerfile: deploy/backend.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: "3100"
+      TZ: Europe/Rome
+      # 密码里若含 @ : / 等字符需先做 URL 编码，建议直接用字母数字
+      DATABASE_URL: postgresql://${POSTGRES_USER:-orderez}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-orderez_supplier}?schema=public
+      JWT_SECRET: ${JWT_SECRET:?请在 deploy/.env 里设置 JWT_SECRET}
+      CREDENTIALS_KEY: ${CREDENTIALS_KEY:?请在 deploy/.env 里设置 CREDENTIALS_KEY}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-12h}
+      REDIS_URL: redis://redis:6379
+      SYNC_ENABLED: ${SYNC_ENABLED:-true}
+      SYNC_INTERVAL_MINUTES: ${SYNC_INTERVAL_MINUTES:-5}
+      SYNC_LOOKBACK_DAYS: ${SYNC_LOOKBACK_DAYS:-30}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080}
+      SEED_ADMIN_USERNAME: ${SEED_ADMIN_USERNAME:-admin}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-}
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          node -e "fetch('http://127.0.0.1:3100/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: deploy/frontend.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+
+volumes:
+  db-data:
+
+# ---------------------------------------------------------------------------
+# 首次部署：建管理员账号
+#
+#   docker compose exec backend node_modules/.bin/ts-node prisma/seed.ts
+#
+# 只想先看看界面长什么样（写入一套虚构数据，会先清空业务表）：
+#
+#   docker compose exec backend node_modules/.bin/ts-node prisma/demo-seed.ts
+#
+# 升级：
+#
+#   git pull && docker compose up -d --build     # 后端启动时自动跑 prisma migrate deploy
+#
+# 备份：
+#
+#   docker compose exec -T db pg_dump -U orderez orderez_supplier | gzip > backup-$(date +%F).sql.gz
+# ---------------------------------------------------------------------------

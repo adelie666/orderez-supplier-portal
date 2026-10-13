@@ -1,0 +1,251 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--oe-bg);
+  color: var(--oe-text);
+  font-family: var(--oe-font-family);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.mono {
+  font-family: var(--oe-font-mono);
+  font-size: 12.5px;
+}
+
+.muted {
+  color: var(--oe-text-muted);
+}
+
+.page {
+  padding: 24px 28px 40px;
+  max-width: 1560px;
+  margin: 0 auto;
+}
+
+.page-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.page-heading h1 {
+  margin: 0;
+  font-family: var(--oe-font-display);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.page-heading p {
+  margin: 5px 0 0;
+  color: var(--oe-text-muted);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.kpi-card {
+  border: 1px solid var(--oe-border);
+  background: var(--oe-surface);
+  border-radius: var(--oe-radius-md);
+  padding: 18px 20px;
+}
+
+.kpi-label {
+  color: var(--oe-text-muted);
+  font-size: 13px;
+}
+
+.kpi-value {
+  margin-top: 8px;
+  font-family: var(--oe-font-display);
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.panel {
+  border: 1px solid var(--oe-border);
+  background: var(--oe-surface);
+  border-radius: var(--oe-radius-md);
+  overflow: hidden;
+}
+
+.panel-body {
+  padding: 20px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+}
+
+.form-section-title {
+  grid-column: 1 / -1;
+  margin: 4px 0 -2px;
+  padding-top: 2px;
+  font-family: var(--oe-font-display);
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.credential-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  color: var(--oe-text-muted);
+  font-size: 13px;
+}
+
+.credential-state .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--oe-border-strong);
+}
+
+.credential-state.configured .dot {
+  background: var(--oe-success);
+}
+
+.summary-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 26px;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  border: 1px solid var(--oe-border);
+  border-radius: var(--oe-radius-md);
+  background: var(--oe-surface);
+}
+
+.summary-strip strong {
+  font-family: var(--oe-font-display);
+  font-size: 18px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px 24px;
+}
+
+.detail-item .label {
+  display: block;
+  color: var(--oe-text-muted);
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+
+.detail-item .value {
+  font-weight: 500;
+}
+
+.ant-table-wrapper .ant-table {
+  border-radius: 0;
+}
+
+.ant-table-thead > tr > th {
+  background: var(--gray-100) !important;
+  color: var(--oe-text-secondary) !important;
+  font-weight: 600 !important;
+}
+
+.ant-btn-primary {
+  background: var(--clay-hover);
+  border-color: var(--clay-hover);
+}
+
+.ant-btn-primary:not(:disabled):hover {
+  background: var(--clay-dark) !important;
+  border-color: var(--clay-dark) !important;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-blue);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1100px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 18px 16px 32px;
+  }
+
+  .kpi-grid,
+  .form-grid,
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-page {
+    padding: 0;
+    max-width: none;
+  }
+}
