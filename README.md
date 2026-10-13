@@ -1,14 +1,14 @@
-<img src="./docs/assets/orderez-logo.svg" alt="OrderEZ" width="180" />
+![OrderEZ](./docs/assets/orderez-logo.svg)
 
 # OrderEZ Supplier Portal（意大利语供应商管理端）
 
-给「国内订货 ERP + 海外供应商」这种组合用的一套 Web 系统：**管理端**给平台方看全局，
+给「国内订货 ERP + 海外供应商」这种组合用的一套 Web 系统：**管理端**给平台方看全局，  
 **供应商端**给不会中文、只看得懂意大利语的人用来查单、发货、看报表。
 
 界面**全意大利语**（`it-IT`）、金额**只算 EUR**、时区按 `Europe/Rome` 走。
 
-> 本项目以 **PolyForm Shield 1.0.0** 发布：**源代码可见，但不是 OSI 开源**。
-> 可自建自用、可在自己公司内部为客户部署；不得用于提供与本项目构成竞争的产品或服务。
+> 本项目以 **PolyForm Shield 1.0.0** 发布：**源代码可见，但不是 OSI 开源**。  
+> 可自建自用、可在自己公司内部为客户部署；不得用于提供与本项目构成竞争的产品或服务。  
 > 详见 [LICENSE](./LICENSE)。
 
 ---
@@ -16,20 +16,20 @@
 ## 界面
 
 | 登录 | 首页 |
-| --- | --- |
+| -- | -- |
 | ![登录](./docs/assets/screenshots/login.png) | ![首页](./docs/assets/screenshots/dashboard.png) |
 
 | 订单 | 报表 |
-| --- | --- |
+| -- | -- |
 | ![订单](./docs/assets/screenshots/orders.png) | ![报表](./docs/assets/screenshots/reports.png) |
 
-（以上是内置演示数据 `pnpm seed:demo` 的效果，供应商与商品均为虚构。
+（以上是内置演示数据 `pnpm seed:demo` 的效果，供应商与商品均为虚构。  
 图片源文件：`docs/assets/screenshots/login.png`、`dashboard.png`、`orders.png`、`reports.png`。）
 
 ## 它解决什么
 
-国内订货 ERP 的供应商门户基本都是中文界面、按国内习惯设计的。当供应商在国外、
-只懂当地语言时，直接给它们开 ERP 账号是行不通的：语言不通、字段看不懂、
+国内订货 ERP 的供应商门户基本都是中文界面、按国内习惯设计的。当供应商在国外、  
+只懂当地语言时，直接给它们开 ERP 账号是行不通的：语言不通、字段看不懂、  
 金额币种和时区对不上、也分不清哪些单是自己的。
 
 这套系统做的是中间层：
@@ -59,11 +59,11 @@
 
 ## 技术栈
 
-| 层 | 选型 |
-| --- | --- |
+| 层  | 选型                                                      |
+| -- | ------------------------------------------------------- |
 | 后端 | NestJS 10 · Prisma 5 · PostgreSQL 16 · BullMQ（可选 Redis） |
-| 前端 | Vue 3 · TypeScript · Vite 6 · Ant Design Vue 4 · Pinia |
-| 部署 | Docker Compose（Nginx + 后端 + Postgres + Redis） |
+| 前端 | Vue 3 · TypeScript · Vite 6 · Ant Design Vue 4 · Pinia  |
+| 部署 | Docker Compose（Nginx + 后端 + Postgres + Redis）           |
 
 ## 快速开始
 
@@ -80,7 +80,7 @@ docker compose logs backend | grep -A6 "Nessun account"
 
 访问 `http://localhost:8080`，用日志里的 `username` / `password` 登录 —— **进去第一件事是改密码**。
 
-不想翻日志，就在 `.env` 里把 `SEED_ADMIN_PASSWORD` 填上，启动后直接用那组账号登录。
+不想翻日志，就在 `.env` 里把 `SEED_ADMIN_PASSWORD` 填上，启动后直接用那组账号登录。  
 后端只在**库里一个用户都没有**时才自动建账号，之后重启不会覆盖任何人的密码。
 
 ### 先看看界面（可选，不需要 ERP 凭证）
@@ -89,15 +89,15 @@ docker compose logs backend | grep -A6 "Nessun account"
 docker compose exec backend node_modules/.bin/ts-node prisma/demo-seed.ts
 ```
 
-写入一套**虚构**的意大利食品供应商 / 商品 / 订单数据（会先清空业务表），
+写入一套**虚构**的意大利食品供应商 / 商品 / 订单数据（会先清空业务表），  
 界面顶部会常驻一条 `Ambiente dimostrativo` 提示条。演示环境的账号：
 
-| 角色 | 账号 | 密码 |
-| --- | --- | --- |
-| 管理员 | `admin` | `OrderEZ@2026` |
+| 角色  | 账号                          | 密码               |
+| --- | --------------------------- | ---------------- |
+| 管理员 | `admin`                     | `OrderEZ@2026`   |
 | 供应商 | `fornitore1` ~ `fornitore4` | `Fornitore@2026` |
 
-真实使用前用 `prisma/seed.ts` 重建管理员，或在「Integrazione」页里重置数据。
+真实使用前用 `prisma/seed.ts` 重建管理员，或在「Integrazione」页里重置数据。  
 完整部署说明（域名、HTTPS、备份、升级、排障）见 [docs/DEPLOY.md](./docs/DEPLOY.md)。
 
 ### 本地开发
@@ -124,14 +124,14 @@ npm run dev                 # http://127.0.0.1:5273，已代理 /api 到 :3100
 
 ## 角色与权限
 
-| | 管理员 | 供应商 |
-| --- | --- | --- |
-| 订单 / 发货 / 报表 | 全部 | 仅自己那份 |
-| 商品 / 供应商档案 | 读写 | 只读自己相关 |
-| 账号管理 `/accounts` | ✅ | 403 |
-| 集成设置 `/settings` | ✅ | 403 |
-| 同步 `/sync` | ✅ | 403 |
-| 修改密码 | 任何人 | 任何人 |
+|                  | 管理员 | 供应商    |
+| ---------------- | --- | ------ |
+| 订单 / 发货 / 报表     | 全部  | 仅自己那份  |
+| 商品 / 供应商档案       | 读写  | 只读自己相关 |
+| 账号管理 `/accounts` | ✅   | 403    |
+| 集成设置 `/settings` | ✅   | 403    |
+| 同步 `/sync`       | ✅   | 403    |
+| 修改密码             | 任何人 | 任何人    |
 
 ## 目录结构
 
@@ -160,22 +160,22 @@ npm run dev                 # http://127.0.0.1:5273，已代理 /api 到 :3100
 - ✅ 基于它做二次开发（需保留许可与版权声明）
 - ❌ 用它提供与本项目构成竞争的产品或服务，包括转售、付费托管、去品牌分发
 
-> Required Notice: Copyright 2026 广州阿德利网络科技有限公司 (Guangzhou Adelie Network Technology Co., Ltd.) — OrderEZ — https://www.adelieyun.com
+> Required Notice: Copyright 2026 广州阿德利网络科技有限公司 (Guangzhou Adelie Network Technology Co., Ltd.) — OrderEZ — <https://www.adelieyun.com>
 
 ## 联系我们
 
-| | |
-| --- | --- |
-| 电话 | 18927528608 |
-| 邮箱 | vip@adelieyun.com |
+|    |                                                |
+| -- | ---------------------------------------------- |
+| 电话 | 18927528608                                    |
+| 邮箱 | <vip@adelieyun.com>                            |
 | 官网 | [www.adelieyun.com](https://www.adelieyun.com) |
 
 ---
 
 ## English
 
-**OrderEZ Supplier Portal** — an Italian-language supplier portal that sits in front of a
-domestic ordering ERP. Platform staff get an admin console; overseas suppliers get a
+**OrderEZ Supplier Portal** — an Italian-language supplier portal that sits in front of a  
+domestic ordering ERP. Platform staff get an admin console; overseas suppliers get a  
 portal in Italian to review their own orders, register shipments and read reports.
 
 - UI in Italian only (`it-IT`), amounts in EUR, times in `Europe/Rome`
@@ -189,6 +189,6 @@ docker compose up -d --build        # http://localhost:8080
 docker compose exec backend node_modules/.bin/ts-node prisma/demo-seed.ts   # fictional demo data
 ```
 
-Licensed under the **PolyForm Shield License 1.0.0** — source-available, **not** OSI open
-source. Self-hosting and internal or client deployments are permitted; competing products
+Licensed under the **PolyForm Shield License 1.0.0** — source-available, **not** OSI open  
+source. Self-hosting and internal or client deployments are permitted; competing products  
 and services are not. See [LICENSE](./LICENSE).
