@@ -21,17 +21,15 @@ async function main() {
   const username = process.env.SEED_ADMIN_USERNAME ?? 'admin';
   const password = process.env.SEED_ADMIN_PASSWORD ?? 'OrderEZ@2026';
 
+  // update 里也写 passwordHash：这个脚本的语义是「把管理员恢复成 .env 里那个账号」，
+  // 所以重跑一次就等于重置密码 —— 忘了密码时这是唯一的恢复入口。
+  const passwordHash = await bcrypt.hash(password, 10);
   const admin = await prisma.user.upsert({
     where: { username },
-    create: {
-      username,
-      passwordHash: await bcrypt.hash(password, 10),
-      role: 'admin',
-      status: 1,
-    },
-    update: {},
+    create: { username, passwordHash, role: 'admin', status: 1 },
+    update: { passwordHash, role: 'admin', status: 1 },
   });
-  console.log(`Amministratore pronto: ${admin.username}`);
+  console.log(`Amministratore pronto: ${admin.username}（密码已重置为 SEED_ADMIN_PASSWORD）`);
 
   try {
     const suppliers = await sync.syncSuppliers();

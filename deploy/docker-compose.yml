@@ -93,9 +93,12 @@ volumes:
   db-data:
 
 # ---------------------------------------------------------------------------
-# 首次部署：建管理员账号
+# 首次部署：管理员账号是自动建的，不用手动跑脚本
 #
-#   docker compose exec backend node_modules/.bin/ts-node prisma/seed.ts
+# 后端启动时发现库里一个用户都没有，就会创建 SEED_ADMIN_USERNAME 这个管理员，
+# 密码取 SEED_ADMIN_PASSWORD；留空则随机生成并打印在日志里（只打印一次）：
+#
+#   docker compose logs backend | grep -A6 "Nessun account"
 #
 # 只想先看看界面长什么样（写入一套虚构数据，会先清空业务表）：
 #

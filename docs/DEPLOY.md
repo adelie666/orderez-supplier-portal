@@ -34,14 +34,36 @@ docker compose up -d --build
 
 起好后访问 `http://<服务器IP>:${HTTP_PORT}`（默认 8080）。
 
-### 建第一个管理员
+### 第一个管理员账号
+
+后端启动时会检查 `users` 表：**一条记录都没有**就自动创建管理员，并把密码打印出来
+（只打印这一次，日志滚过去就没了）：
 
 ```bash
-docker compose exec backend node_modules/.bin/ts-node prisma/seed.ts
+docker compose logs backend | grep -A6 "Nessun account"
 ```
 
-用户名密码取自 `.env` 的 `SEED_ADMIN_USERNAME` / `SEED_ADMIN_PASSWORD`（默认 `admin` / `OrderEZ@2026`）。
-**建完账号后请把 `SEED_ADMIN_PASSWORD` 从 `.env` 删掉，并在页面上改掉密码。**
+```
+==============================================================
+ Nessun account presente: creato il primo amministratore.
+ 库中没有任何账号，已自动创建第一个管理员：
+   username / 账号 : admin
+   password / 密码 : 9f3c1a...
+   （随机生成，只打印这一次，请立刻保存）
+ 首次登录后请立即修改密码。
+==============================================================
+```
+
+- 想在部署前就把密码定下来：在 `.env` 填 `SEED_ADMIN_PASSWORD`（建议 12 位以上），启动后直接用这组账号。
+- 库里**已有任何用户时这一步完全不介入**，所以重启不会覆盖已经改过的密码。忘了密码就跑一次 seed：
+
+  ```bash
+  docker compose exec backend node_modules/.bin/ts-node prisma/seed.ts
+  ```
+
+  它会把管理员密码**重置**成 `.env` 里的 `SEED_ADMIN_PASSWORD`，并顺手触发一次全量同步
+  （未配 ERP 凭证时只是打一条告警，不影响重置）。
+- 登录后第一件事：右上角账号 → 修改密码。
 
 ### 灌一套演示数据（可选）
 
@@ -78,8 +100,8 @@ cp .env.example .env        # 填 DATABASE_URL / JWT_SECRET / CREDENTIALS_KEY
 pnpm install
 pnpm prisma migrate deploy  # 建表
 pnpm build
-pnpm seed                   # 建管理员（可选加 SEED_DEMO_SUPPLIERS=true 建演示供应商账号）
-node dist/main.js           # 监听 :3100
+node dist/main.js           # 监听 :3100；首次启动自动建管理员并打印密码
+                            # 想灌演示数据：pnpm seed:demo
 
 # 前端
 cd ../frontend
@@ -148,6 +170,7 @@ ERP 凭证密文就解不开了（重新在页面上填一次即可，不影响�
 | 现象 | 排查方向 |
 | --- | --- |
 | 容器起不来，日志提示 `JWT_SECRET non configurato` | `.env` 里 `JWT_SECRET` 为空。生产环境缺这个值会拒绝启动，属预期行为 |
+| 不知道初始密码 / 登不进去 | `docker compose logs backend \| grep -A6 "Nessun account"`；日志已经被刷掉就重跑一次 `prisma/seed.ts`，会把密码重置成 `.env` 里的 `SEED_ADMIN_PASSWORD` |
 | 页面能打开但一直转圈 / 接口 502 | `docker compose logs backend`；多半是后端还在跑迁移或数据库没起来 |
 | 装完依赖提示 `Ignored build scripts` | 后端 `pnpm-workspace.yaml` 的 `allowBuilds` 没生效，重跑 `pnpm install` |
 | 同步一直不跑 | 「Integrazione」页凭证是否齐全；`SYNC_ENABLED` 是否为 `true`；看「同步日志」里的报错 |

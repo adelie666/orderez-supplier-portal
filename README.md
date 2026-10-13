@@ -23,7 +23,8 @@
 | --- | --- |
 | ![订单](./docs/assets/screenshots/orders.png) | ![报表](./docs/assets/screenshots/reports.png) |
 
-（以上是内置演示数据 `pnpm seed:demo` 的效果，供应商与商品均为虚构。）
+（以上是内置演示数据 `pnpm seed:demo` 的效果，供应商与商品均为虚构。
+图片源文件：`docs/assets/screenshots/login.png`、`dashboard.png`、`orders.png`、`reports.png`。）
 
 ## 它解决什么
 
@@ -72,26 +73,31 @@
 cd deploy
 cp .env.example .env     # 填 POSTGRES_PASSWORD / JWT_SECRET / CREDENTIALS_KEY
 docker compose up -d --build
+
+# 首次启动会自动创建管理员账号，密码只打印这一次
+docker compose logs backend | grep -A6 "Nessun account"
 ```
 
-访问 `http://localhost:8080`。然后建管理员账号：
+访问 `http://localhost:8080`，用日志里的 `username` / `password` 登录 —— **进去第一件事是改密码**。
 
-```bash
-docker compose exec backend node_modules/.bin/ts-node prisma/seed.ts
-```
+不想翻日志，就在 `.env` 里把 `SEED_ADMIN_PASSWORD` 填上，启动后直接用那组账号登录。
+后端只在**库里一个用户都没有**时才自动建账号，之后重启不会覆盖任何人的密码。
 
-想先看看界面长什么样，不需要 ERP 凭证，灌一套演示数据：
+### 先看看界面（可选，不需要 ERP 凭证）
 
 ```bash
 docker compose exec backend node_modules/.bin/ts-node prisma/demo-seed.ts
 ```
+
+写入一套**虚构**的意大利食品供应商 / 商品 / 订单数据（会先清空业务表），
+界面顶部会常驻一条 `Ambiente dimostrativo` 提示条。演示环境的账号：
 
 | 角色 | 账号 | 密码 |
 | --- | --- | --- |
 | 管理员 | `admin` | `OrderEZ@2026` |
 | 供应商 | `fornitore1` ~ `fornitore4` | `Fornitore@2026` |
 
-演示数据是虚构的，会先清空业务表再写入。生产环境请改掉默认密码。
+真实使用前用 `prisma/seed.ts` 重建管理员，或在「Integrazione」页里重置数据。
 完整部署说明（域名、HTTPS、备份、升级、排障）见 [docs/DEPLOY.md](./docs/DEPLOY.md)。
 
 ### 本地开发
@@ -104,8 +110,9 @@ cd backend
 cp .env.example .env        # 填 DATABASE_URL / JWT_SECRET / CREDENTIALS_KEY
 pnpm install
 pnpm prisma migrate deploy
-pnpm seed                   # 建管理员；加 SEED_DEMO_SUPPLIERS=true 会一并建演示供应商账号
 pnpm start:dev              # http://127.0.0.1:3100/api
+                            # 首次启动自动建管理员：admin / OrderEZ@2026
+                            # （取 backend/.env 的 SEED_ADMIN_PASSWORD，留空则随机并打印在日志里）
 
 # 前端（用 npm，另开一个终端）
 cd frontend

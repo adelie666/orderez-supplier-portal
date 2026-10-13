@@ -33,7 +33,7 @@
 
 | 模块 | 职责 |
 | --- | --- |
-| `auth/` | 登录、JWT 签发与校验、`admin` / `supplier` 角色守卫、改密码 |
+| `auth/` | 登录、JWT 签发与校验、`admin` / `supplier` 角色守卫、改密码、首次启动自动建管理员（`admin-bootstrap.ts`，由 `main.ts` 调用） |
 | `settings/` | 集成凭证（唯一入口），敏感值 AES-256-GCM 加密落库、接口只回掩码 |
 | `integration/` | `ErpClient`（唯一 ERP 出入口，读 + 写同一套凭证）、`GatewayClient`（类型化只读适配层） |
 | `sync/` | 拉单水位、定时任务、同步日志、全量重算供应商归属 |
