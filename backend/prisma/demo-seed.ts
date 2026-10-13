@@ -1,7 +1,7 @@
 /**
  * OrderEZ · 演示数据（虚构数据，与任何真实客户无关）
  *
- * 用途：让任何人 clone 仓库后，不需要真实订货宝凭证，也能看到完整的
+ * 用途：让任何人 clone 仓库后，不需要真实上游 ERP 凭证，也能看到完整的
  * 仪表盘 / 订单 / 发货 / 报表效果。
  *
  * 运行：
@@ -459,7 +459,7 @@ async function main(): Promise<void> {
   // 标记演示模式，前端据此显示提示条
   for (const [key, value] of Object.entries({
     'demo.mode': 'true',
-    'erp.base_url': 'https://erp.dhb168.com/',
+    'erp.base_url': process.env.ERP_BASE_URL?.trim() || 'https://erp.example.com/',
     'erp.supplier_field': 'field_6',
   })) {
     await prisma.setting.upsert({

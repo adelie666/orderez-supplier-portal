@@ -16,7 +16,7 @@ const MAX_PAGE_SIZE = 200;
 const NO_SUPPLIER = '__none__';
 
 /**
- * Elenco articoli sincronizzati da Dinghuobao.
+ * Elenco articoli sincronizzati dal gestionale.
  *
  * L'API ERP non espone il fornitore dell'articolo: la mappatura vive nel portale e
  * l'amministratore la imposta da qui. Gli ordini ereditano il fornitore degli articoli.

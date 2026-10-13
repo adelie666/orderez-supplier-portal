@@ -204,9 +204,9 @@ function onPageChange(next: number, size: number) {
 }
 
 /**
- * Rilegge articoli e fornitori da Dinghuobao (compreso il campo fornitore dell'articolo).
+ * Rilegge articoli e fornitori dal gestionale (compreso il campo fornitore dell'articolo).
  * "Aggiorna" ricarica solo la lista locale: senza questo passaggio la pagina continua a
- * mostrare l'ultimo dato importato anche se in Dinghuobao e' cambiato.
+ * mostrare l'ultimo dato importato anche se nel gestionale e' cambiato.
  */
 async function syncCatalogNow() {
   syncing.value = true;
@@ -236,7 +236,7 @@ onMounted(() => {
       <div class="oe-bread-left">
         <h1 class="oe-bread-title">{{ auth.isSupplier ? 'I miei articoli' : 'Articoli' }}</h1>
         <span class="oe-bread-sub">
-          Articoli sincronizzati da Dinghuobao.
+          Articoli sincronizzati dal gestionale.
           <template v-if="auth.isAdmin">
             {{ catalogTotal }} articoli &middot; {{ unmapped }} senza fornitore.
           </template>
@@ -363,7 +363,7 @@ onMounted(() => {
 
       <div class="oe-footer-bar">
         <div class="oe-footer-left">
-          <span class="oe-cell-sub">Articoli sincronizzati da Dinghuobao</span>
+          <span class="oe-cell-sub">Articoli sincronizzati dal gestionale</span>
         </div>
         <div class="oe-footer-right">
           <span class="oe-footer-total">{{ total }} articoli</span>

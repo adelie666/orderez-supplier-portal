@@ -85,7 +85,7 @@ export class ShipmentsService {
   }
 
   /**
-   * 该订单在订货宝是否已有出库（发货）单 —— 只读。
+   * 该订单在上游 ERP 是否已有出库（发货）单 —— 只读。
    * 详情页用它解释「为什么这单不能在这里发货」，而不是只把按钮置灰。
    */
   async erpShipment(orderId: number, user: JwtPayload) {
@@ -187,16 +187,16 @@ export class ShipmentsService {
     }
   }
 
-  /** 把订货宝返回的中文错误翻译成意大利语提示（操作员是意大利人） */
+  /** 把上游 ERP 返回的中文错误翻译成意大利语提示（操作员是意大利人） */
   private italianErpError(message: string): string {
     if (/不为待出库状态|不允许出库/.test(message)) {
-      return 'Dinghuobao ha rifiutato la spedizione: l\'ordine non è in stato "Da evadere". Sincronizza lo stato e riprova.';
+      return 'Il gestionale ha rifiutato la spedizione: l\'ordine non è in stato "Da evadere". Sincronizza lo stato e riprova.';
     }
     if (/已经存在|重复|已出库/.test(message)) {
-      return 'Dinghuobao segnala una spedizione già registrata per questo ordine.';
+      return 'Il gestionale segnala una spedizione già registrata per questo ordine.';
     }
     if (/不存在|无效|错误/.test(message)) {
-      return 'Dinghuobao ha rifiutato la spedizione: dati dell\'ordine non validi.';
+      return 'Il gestionale ha rifiutato la spedizione: dati dell\'ordine non validi.';
     }
     return message;
   }
@@ -236,7 +236,7 @@ export class ShipmentsService {
   }
 
   /**
-   * 查该订单在订货宝是否已有出库（发货）单 —— 发货前对账，只读。
+   * 查该订单在上游 ERP 是否已有出库（发货）单 —— 发货前对账，只读。
    * 时间窗从订单创建日往前 1 天到现在，避免每次都把 1000+ 条发货单全拉下来。
    */
   private async findExistingDelivery(order: { erpOrdersNum: string; erpCreateDate?: Date | null }) {
@@ -257,12 +257,12 @@ export class ShipmentsService {
   }
 
   /**
-   * 发货回写订货宝。operatorName 会作为发货单备注回传，这样订货宝的「操作日志 /
-   * 发货单」能查到是门户里哪个账号点的发货（订货宝 API 调用本身没有登录人）。
+   * 发货回写上游 ERP。operatorName 会作为发货单备注回传，这样上游 ERP 的「操作日志 /
+   * 发货单」能查到是门户里哪个账号点的发货（上游 ERP API 调用本身没有登录人）。
    */
   private callErp(orderSn: string, dto: ShipOrderDto, operatorName?: string) {
     // La nota del fornitore e' il contenuto principale; l'attribuzione dell'operatore
-    // resta in coda, cosi' su Dinghuobao si vede comunque chi ha spedito.
+    // resta in coda, cosi' sul gestionale si vede comunque chi ha spedito.
     const note = dto.remark?.trim();
     const attribution = operatorName ? `OrderEZ - spedito da: ${operatorName}` : '';
     const consignmentRemark = [note, attribution].filter(Boolean).join(' | ');
@@ -290,7 +290,7 @@ export class ShipmentsService {
     });
     const priceOf = (goodsId?: string | null, optionsId?: string | null) => {
       const hit = products.find((p) => p.erpGoodsId === (goodsId ?? '') && p.erpOptionsId === (optionsId ?? ''));
-      // 订货宝的 purchase 字段常为 0（未维护进货价）→ 视为未知，回退到订单行价格
+      // 上游 ERP 的 purchase 字段常为 0（未维护进货价）→ 视为未知，回退到订单行价格
       const value = hit?.purchasePrice;
       return value && Number(value) > 0 ? value : null;
     };
@@ -333,7 +333,7 @@ export class ShipmentsService {
         },
       });
 
-      // 订单状态用订货宝订单状态值 received（待收货）；receivedin 是发货单状态，不能混用
+      // 订单状态用上游 ERP 订单状态值 received（待收货）；receivedin 是发货单状态，不能混用
       await tx.order.update({ where: { id: orderId }, data: { status: 'received' } });
     });
 

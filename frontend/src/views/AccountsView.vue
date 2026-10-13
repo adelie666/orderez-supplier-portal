@@ -50,7 +50,7 @@ async function load() {
   }
 }
 
-/** Rilegge l'elenco fornitori da Dinghuobao: i fornitori creati di recente compaiono solo dopo questa sincronizzazione. */
+/** Rilegge l'elenco fornitori dal gestionale: i fornitori creati di recente compaiono solo dopo questa sincronizzazione. */
 async function refreshSuppliersFromErp() {
   supplierSyncing.value = true;
   try {
@@ -216,7 +216,7 @@ onMounted(load);
             @click="refreshSuppliersFromErp"
           >
             <template #icon><SyncOutlined /></template>
-            Aggiorna elenco fornitori da Dinghuobao
+            Aggiorna elenco fornitori dal gestionale
           </a-button>
         </a-form-item>
         <a-form-item label="Username">

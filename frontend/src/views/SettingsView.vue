@@ -20,7 +20,7 @@ const status = ref<SettingsResponse['status'] | null>(null);
 const testResult = ref<{ ok: boolean; message: string; expiresIn?: number } | null>(null);
 
 
-/** Campo personalizzato Dinghuobao usato per il fornitore dell'articolo. */
+/** Campo personalizzato dell'ERP usato per il fornitore dell'articolo. */
 const supplierFieldOptions = [
   { value: 'field_1', label: 'Campo personalizzato 1' },
   { value: 'field_2', label: 'Campo personalizzato 2' },
@@ -89,7 +89,7 @@ function expiresLabel(seconds?: number): string {
 
 onMounted(load);
 
-/** Azzera i dati di esercizio quando si collega un altro gestionale Dinghuobao. */
+/** Azzera i dati di esercizio quando si collega un altro gestionale. */
 function onReset() {
   Modal.confirm({
     title: 'Reinizializzare tutti i dati?',
@@ -121,7 +121,7 @@ function onReset() {
     <header class="page-heading">
       <div>
         <h1>Integrazione</h1>
-        <p>Credenziali Dinghuobao, mappatura articoli e log di sincronizzazione.</p>
+        <p>Credenziali ERP, mappatura articoli e log di sincronizzazione.</p>
       </div>
       <div v-if="activeTab === 'credenziali'" class="heading-actions">
         <a-button :loading="testing" :disabled="loading" @click="test">
@@ -142,7 +142,7 @@ function onReset() {
       type="warning"
       show-icon
       class="settings-alert"
-      message="Credenziali Dinghuobao non configurate"
+      message="Credenziali ERP non configurate"
       description="La sincronizzazione e sospesa finche non salvi numero seriale e password."
     />
 
@@ -160,7 +160,7 @@ function onReset() {
         <section class="panel">
           <div class="panel-head">
             <div>
-              <h2>Dinghuobao ERP</h2>
+              <h2>Gestionale ERP</h2>
               <p class="muted">Stesso accesso per lettura ordini, articoli e anagrafiche e per la registrazione delle spedizioni.</p>
             </div>
             <span class="credential-state" :class="{ configured: status?.configured }">
@@ -174,10 +174,10 @@ function onReset() {
                 <a-input v-model:value="form.baseUrl" :placeholder="status?.baseUrl" />
               </a-form-item>
               <a-form-item label="Numero seriale">
-                <a-input v-model:value="form.serialNumber" class="mono-input" placeholder="Numero seriale fornito da Dinghuobao" />
+                <a-input v-model:value="form.serialNumber" class="mono-input" placeholder="Numero seriale fornito dal gestionale" />
               </a-form-item>
               <a-form-item label="Password">
-                <a-input v-model:value="form.password" class="mono-input" placeholder="Password fornita da Dinghuobao" />
+                <a-input v-model:value="form.password" class="mono-input" placeholder="Password fornita dal gestionale" />
               </a-form-item>
               <a-form-item class="span-all" label="Campo fornitore articolo">
                 <a-select v-model:value="form.supplierField" :options="[{ value: '', label: 'Nessuno' }, ...supplierFieldOptions]" />
@@ -189,7 +189,7 @@ function onReset() {
             </p>
             <p class="hint">
               <InfoCircleOutlined />
-              Il valore di questo campo personalizzato in Dinghuobao diventa il fornitore dell'articolo, ma solo se corrisponde a un fornitore presente in anagrafica. Gli altri valori vengono ignorati.
+              Il valore di questo campo personalizzato nel gestionale diventa il fornitore dell'articolo, ma solo se corrisponde a un fornitore presente in anagrafica. Gli altri valori vengono ignorati.
             </p>
           </div>
         </section>
@@ -198,7 +198,7 @@ function onReset() {
           <div class="panel-head">
             <div>
               <h2>Cambio gestionale</h2>
-              <p class="muted">Collega un altro numero seriale Dinghuobao: prima salva le nuove credenziali, poi azzera i dati di esercizio.</p>
+              <p class="muted">Collega un altro numero seriale del gestionale: prima salva le nuove credenziali, poi azzera i dati di esercizio.</p>
             </div>
           </div>
           <div class="panel-body">
@@ -210,7 +210,7 @@ function onReset() {
               v-if="status && !status.configured"
               type="warning"
               show-icon
-              message="Credenziali Dinghuobao non configurate"
+              message="Credenziali ERP non configurate"
               description="La sincronizzazione e sospesa. Salva prima numero seriale e password."
             />
             <a-button danger :loading="resetting" :disabled="!status?.configured" @click="onReset">
@@ -281,7 +281,7 @@ function onReset() {
   font-size: 13px;
 }
 
-/* Zona pericolosa: cambio gestionale Dinghuobao con azzeramento dei dati. */
+/* Zona pericolosa: cambio gestionale con azzeramento dei dati. */
 .danger-panel {
   border-color: var(--oe-danger);
 }

@@ -4,9 +4,9 @@ import { SettingsService, IntegrationConfig } from '../settings/settings.service
 import { AddAllShipsRequest, AddAllShipsResult } from './types';
 
 /**
- * 订货宝 ERP 客户端 —— 唯一的订货宝集成入口（读 + 写走同一套凭证）。
+ * 上游 ERP 客户端 —— 唯一的 ERP 集成入口（读 + 写走同一套凭证）。
  *
- * 协议（2026-10-08 对 erp.dhb168.com 实测确认）：
+ * 协议：
  *   POST {base}/home/index/erpIndex
  *   Content-Type: application/json
  *   Body: {"f": "<方法名>", "v": { ...参数, "sKey": "<token>" }}
@@ -16,9 +16,8 @@ import { AddAllShipsRequest, AddAllShipsResult } from './types';
  * 关键 rStatus：100 成功 / 101 成功但有警告 / 201 账号密码不匹配 /
  *              203 sKey 过期（自动刷新重试一次）/ 209 参数错误 / 210 方法不存在。
  *
- * 说明：早期规划假设「读走新网关 X-Api-Key、写走旧 ERP」，实际客户的订货宝
- * 只有这套 sKey 接口，读接口（getOrderList / getGoodsList / getSupplierList）
- * 同样存在，因此统一为一套凭证，界面上也只保留一处填写入口。
+ * 说明：读接口（getOrderList / getGoodsList / getSupplierList）与写接口共用同一套
+ * 凭证与端点，因此统一为一处配置，界面上也只保留一个填写入口。
  */
 export const ERP_ENDPOINT = 'home/index/erpIndex';
 
@@ -70,7 +69,7 @@ export class ErpClient {
     const config = await this.settings.integration();
     if (!config.erpConfigured) {
       throw new ErpError(
-        'Credenziali Dinghuobao non configurate: impostare numero seriale e password.',
+        'Credenziali ERP non configurate: impostare numero seriale e password.',
         ERP_STATUS.AUTH_FAIL,
       );
     }
@@ -180,7 +179,7 @@ export class ErpClient {
 
   // ------------------------------------------------------------------ 写接口
 
-  /** 发货回写：订货宝订单 → 待收货（receivedin） */
+  /** 发货回写：上游 ERP 订单 → 待收货（receivedin） */
   async addAllShips(req: AddAllShipsRequest): Promise<AddAllShipsResult> {
     const payload = await this.call<Record<string, unknown>>('addAllShips', {
       orderSn: req.orderSn,

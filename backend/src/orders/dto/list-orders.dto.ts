@@ -5,12 +5,12 @@ import { Type } from 'class-transformer';
  * 可发货状态：仅「待出库 stockup」。
  * 实测（2026-10-08）addAllShips 会直接拒绝非待出库的订单：
  *   rStatus 204 订单号（xxx）对应的订单不为待出库状态，不允许出库（发货）
- * 所以 pending（待审核）不能出现在这里，必须先到订货宝审核通过。
+ * 所以 pending（待审核）不能出现在这里，必须先到上游 ERP 审核通过。
  * 注意：返回值为 stockup（无下划线）；仅 order_status_val 入参用下划线写法 stock_up。
  */
 export const SHIPPABLE_STATUSES = ['stockup'] as const;
 
-/** 订单状态全集（订货宝 OrderStatus 返回值） */
+/** 订单状态全集（上游 ERP OrderStatus 返回值） */
 export const ORDER_STATUSES = [
   'pricing',
   'pending',
@@ -22,7 +22,7 @@ export const ORDER_STATUSES = [
   'cancelled',
 ] as const;
 
-/** 支付状态全集（订货宝 pay_status 返回值） */
+/** 支付状态全集（上游 ERP pay_status 返回值） */
 export const PAY_STATUSES = ['oblig', 'uncollect', 'paided', 'cancelled'] as const;
 
 /** 列表筛选用：发货记录的状态分组 */

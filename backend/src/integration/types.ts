@@ -1,5 +1,5 @@
 /**
- * 订货宝（新网关 / 旧 ERP）原始记录 → 内部规范化模型
+ * 上游 ERP（新网关 / 旧 ERP）原始记录 → 内部规范化模型
  * 字段名对齐规划 §5.1 / §5.2，未确认字段用 optional 保留，联调时补全。
  */
 
@@ -56,7 +56,7 @@ export interface RawGoods {
   goods_name?: string;
   options_name?: string;
   supplier_name?: string;
-  /** Campi personalizzati Dinghuobao (field_1..field_6), solo quelli valorizzati. */
+  /** Campi personalizzati dell'ERP (field_1..field_6), solo quelli valorizzati. */
   custom_fields?: Record<string, string>;
   whole_price?: string | number;
   purchase_price?: string | number;
@@ -90,7 +90,7 @@ export interface AddAllShipsRequest {
   forceStatus?: string;
   consignmentNO?: string;
   consignmentName?: string;
-  /** 发货单备注 —— 门户把「谁点的发货」写在这里，订货宝的操作日志/发货单能看到 */
+  /** 发货单备注 —— 门户把「谁点的发货」写在这里，上游 ERP 的操作日志/发货单能看到 */
   consignmentRemark?: string;
 }
 
@@ -102,8 +102,8 @@ export interface AddAllShipsResult {
 }
 
 /**
- * 订货宝 ERP（erp.dhb168.com/home/index/erpIndex）原始字段。
- * 以下键名来自 2026-10-08 实测响应，不是文档猜测。
+ * 上游 ERP（{base}/home/index/erpIndex）原始字段。
+ * 以下键名来自实际接口响应，不是文档猜测。
  */
 export interface ErpSupplier {
   guid?: string | number;
@@ -192,7 +192,7 @@ export interface ErpGoods {
   field_6?: string;
   units?: string;
   conversionnumber?: string | number;
-  /** Percorso relativo dell'immagine articolo (host img.dhb168.com). */
+  /** Percorso relativo dell'immagine articolo (sull'host immagini configurato). */
   goods_picture?: string | null;
   multi?: ErpGoodsMulti[];
 }
@@ -209,7 +209,7 @@ export interface ErpShip {
   ships_date?: string;
 }
 
-/** 订货宝分页返回：{ page, page_size, total, total_page, data[] } */
+/** 上游 ERP 分页返回：{ page, page_size, total, total_page, data[] } */
 export interface ErpPaged<T> {
   page?: number;
   page_size?: number;

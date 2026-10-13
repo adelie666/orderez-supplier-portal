@@ -25,7 +25,7 @@ const loading = ref(true);
 const shipping = ref(false);
 const shipOpen = ref(false);
 const printOpen = ref(false);
-/** Documento di spedizione già presente su Dinghuobao (solo se l'ordine non è spedibile qui). */
+/** Documento di spedizione già presente sul gestionale (solo se l'ordine non è spedibile qui). */
 const erpShipment = ref<{ ships_num?: string; orders_num?: string; status?: string } | null>(null);
 const shipForm = reactive({ consignmentNo: '', consignmentName: '', remark: '' });
 
@@ -253,7 +253,7 @@ const shipmentColumns = [
   { title: 'Data', dataIndex: 'shippedAt', key: 'shippedAt', width: 170 },
 ];
 
-/** Solo "Da evadere" (stockup) è spedibile: Dinghuobao rifiuta ogni altro stato. */
+/** Solo "Da evadere" (stockup) è spedibile: il gestionale rifiuta ogni altro stato. */
 const shipState = computed(() => {
   const o = order.value;
   if (!o) return { canShip: false, reason: '' };
@@ -265,7 +265,7 @@ const shipState = computed(() => {
   if (o.status !== 'stockup') {
     return {
       canShip: false,
-      reason: `Ordine non spedibile: stato attuale "${orderStatusLabel(o.status)}". Su Dinghuobao l'ordine deve essere in stato "Da evadere".`,
+      reason: `Ordine non spedibile: stato attuale "${orderStatusLabel(o.status)}". Sul gestionale l'ordine deve essere in stato "Da evadere".`,
     };
   }
   if (!o.items?.length) return { canShip: false, reason: 'Ordine senza righe.' };
@@ -277,11 +277,11 @@ const canShip = computed(() => shipState.value.canShip);
 const shipHint = computed(() => {
   const o = order.value;
   if (!o || canShip.value) return '';
-  // Se su Dinghuobao esiste già un documento di spedizione, quello è il motivo vero.
+  // Se sul gestionale esiste già un documento di spedizione, quello è il motivo vero.
   const doc = erpShipment.value;
   if (doc?.ships_num) {
     const stato = doc.status ? ` (${shipmentStatusLabel(doc.status)})` : '';
-    return `Già spedito su Dinghuobao: ${doc.ships_num}${stato}. Gestibile solo dal gestionale.`;
+    return `Già spedito: ${doc.ships_num}${stato}. Gestibile solo dal gestionale.`;
   }
   return shipState.value.reason;
 });
@@ -292,7 +292,7 @@ async function load() {
   try {
     const data = await getOrder(Number(route.params.id));
     order.value = data;
-    // Solo quando non c'è nulla da spedire qui: verifica se Dinghuobao ha già spedito.
+    // Solo quando non c'è nulla da spedire qui: verifica se il gestionale ha già spedito.
     if (!data.shipments?.length && data.status !== 'stockup') {
       erpShipment.value = await getErpShipment(data.id).catch(() => null);
     }
@@ -510,7 +510,7 @@ watch(
         <a-form-item label="Corriere (opzionale)">
           <a-input v-model:value="shipForm.consignmentName" placeholder="es. DHL, BRT" />
         </a-form-item>
-        <a-form-item label="Nota per Dinghuobao (opzionale)">
+        <a-form-item label="Nota per il gestionale (opzionale)">
           <a-textarea
             v-model:value="shipForm.remark"
             :rows="3"
@@ -518,7 +518,7 @@ watch(
             show-count
             placeholder="es. consegnare al piano, citofono, orario preferito..."
           />
-          <span class="muted">La nota viene registrata sulla spedizione in Dinghuobao.</span>
+          <span class="muted">La nota viene registrata sulla spedizione nel gestionale.</span>
         </a-form-item>
       </a-form>
     </a-modal>

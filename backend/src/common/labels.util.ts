@@ -1,6 +1,6 @@
 /**
  * Etichette italiane condivise (usate dove il testo viene generato lato server,
- * per esempio negli export Excel). I valori arrivano da Dinghuobao.
+ * per esempio negli export Excel). I valori arrivano dal gestionale.
  */
 
 const ORDER_STATUS: Record<string, string> = {

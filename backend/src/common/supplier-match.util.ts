@@ -1,5 +1,5 @@
 /**
- * Corrispondenza articolo -> fornitore tramite un campo personalizzato Dinghuobao.
+ * Corrispondenza articolo -> fornitore tramite un campo personalizzato dell'ERP.
  *
  * L'API ERP non espone il fornitore sull'anagrafica articolo: il fornitore viene
  * scritto in un campo personalizzato (field_1..field_6) e qui viene riconosciuto

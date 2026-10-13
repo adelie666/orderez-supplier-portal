@@ -4,23 +4,23 @@ import { PrismaService } from '../prisma/prisma.service';
 import { decryptSecret, encryptSecret, isEncryptedSecret } from '../config/credentials-crypto';
 
 /**
- * 集成配置 —— 只有一处凭证：订货宝 ERP（erp.dhb168.com）。
+ * 集成配置 —— 只有一处凭证：上游 ERP。
  *
- * 早期规划假设「读走新网关 X-Api-Key、写走旧 ERP sKey」，实测客户账号只有一套
- * sKey 凭证且读写接口齐备，故合并为单一配置，界面也只保留一个填写入口。
+ * 上游 ERP 的读写接口共用同一套凭证，因此合并为单一配置，
+ * 界面也只保留一个填写入口。
  */
 export const SETTING_KEYS = {
   erpBaseUrl: 'erp.base_url',
   erpSerialNumber: 'erp.serial_number',
   erpPassword: 'erp.password',
-  /** Campo personalizzato Dinghuobao usato come fornitore dell'articolo (field_1..field_6). */
+  /** Campo personalizzato dell'ERP usato come fornitore dell'articolo (field_1..field_6). */
   supplierField: 'erp.supplier_field',
 } as const;
 
 /** 敏感键：落库前 AES-256-GCM 加密，接口只回掩码 */
 export const SECRET_SETTING_KEYS = new Set<string>([SETTING_KEYS.erpSerialNumber, SETTING_KEYS.erpPassword]);
 
-export const DEFAULT_ERP_BASE_URL = 'https://erp.dhb168.com/';
+export const DEFAULT_ERP_BASE_URL = process.env.ERP_BASE_URL?.trim() || 'https://erp.example.com/';
 export const ERP_ENDPOINT = 'home/index/erpIndex';
 
 export interface IntegrationConfig {

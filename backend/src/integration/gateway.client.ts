@@ -20,12 +20,11 @@ import {
 } from './types';
 
 /**
- * 只读适配层：把订货宝 ERP 的原始字段翻译成内部规范化模型（Raw*）。
+ * 只读适配层：把上游 ERP 的原始字段翻译成内部规范化模型（Raw*）。
  *
- * 早期版本假设读接口来自「新网关 gateway.shiju.cloud + X-Api-Key」，实测客户账号
- * 只有 erp.dhb168.com 的 sKey 接口，且读接口齐备，故改为复用 ErpClient。
+ * 读写接口共用同一套凭证与端点，因此直接复用 ErpClient。
  *
- * 分页：订货宝列表接口用 begin（偏移）+ step（条数，最大 1000）。
+ * 分页：上游 ERP 列表接口用 begin（偏移）+ step（条数，最大 1000）。
  */
 const MAX_DELIVERY_PAGES = 20;
 
@@ -75,7 +74,7 @@ export class GatewayClient {
   /**
    * 订单头列表（getOrderList）。page 从 1 起。
    *
-   * 订货宝默认只返回「未下载（apiStatus=F）」且「后台配置状态（默认待出库）」的订单，
+   * 上游 ERP 默认只返回「未下载（apiStatus=F）」且「后台配置状态（默认待出库）」的订单，
    * 且拉取后会自动标记已下载、同一订单不再出现。门户需要持续跟踪订单状态，
    * 因此固定 apiStatus=all / order_status_val=all，并用 updateGe/updateLe 做增量。
    */
@@ -191,7 +190,7 @@ function mapOrderContent(payload: ErpOrderContent, fallback: RawOrder): RawOrder
 }
 
 function mapOrderLine(row: ErpOrderLine): RawOrderItem {
-  // 订货宝销售明细不返回商品 guid / options_id，只能按「商品编码 + 规格编码」匹配，
+  // 上游 ERP 销售明细不返回商品 guid / options_id，只能按「商品编码 + 规格编码」匹配，
   // 因此 products 也用 coding / options_goods_num 作为业务键。
   const goodsCode = row.Coding != null ? String(row.Coding) : undefined;
   const optionCode = row.options_goods_num != null ? String(row.options_goods_num) : row.skuNo;

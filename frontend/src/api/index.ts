@@ -59,7 +59,7 @@ export async function getOrderNeighbors(id: number) {
   return data;
 }
 
-/** Documento di spedizione già presente su Dinghuobao per questo ordine (solo lettura). */
+/** Documento di spedizione già presente sul gestionale per questo ordine (solo lettura). */
 export async function getErpShipment(orderId: number) {
   const { data } = await api.get<{ ships_num?: string; orders_num?: string; status?: string } | null>(
     `/orders/${orderId}/erp-shipment`,
@@ -202,13 +202,13 @@ export interface ResetResult {
   };
 }
 
-/** Azzera i dati di esercizio per collegare un altro gestionale Dinghuobao. */
+/** Azzera i dati di esercizio per collegare un altro gestionale. */
 export async function resetData() {
   const { data } = await api.post<ResetResult>('/sync/reset', { confirm: 'REINIZIALIZZA' });
   return data;
 }
 
-/** Importa da Dinghuobao le spedizioni registrate fuori dal portale (getShipsList). */
+/** Importa dal gestionale le spedizioni registrate fuori dal portale (getShipsList). */
 export async function syncShipments(days = 120) {
   const { data } = await api.post('/sync/shipments', { days });
   return data as { scanned: number; created: number; updated: number; unmatched: number; skipped: number };

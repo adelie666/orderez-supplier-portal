@@ -232,7 +232,7 @@ function toggleAll(event: { target: { checked: boolean } }) {
   }
 }
 
-/** Documento di spedizione collegato all'ordine: e' l'esito del ritorno a Dinghuobao. */
+/** Documento di spedizione collegato all'ordine: e' l'esito del ritorno al gestionale. */
 function shipmentInfo(record: Order) {
   const shipment = record.shipments?.[0];
   if (!shipment) return null;
@@ -329,7 +329,7 @@ async function runExport(ids?: number[]) {
   }
 }
 
-/** Spedizione in blocco: invia a Dinghuobao gli ordini selezionati, uno per volta. */
+/** Spedizione in blocco: invia al gestionale gli ordini selezionati, uno per volta. */
 async function doBatchShip(ids: number[]) {
   batchShipping.value = true;
   let done = 0;
@@ -347,7 +347,7 @@ async function doBatchShip(ids: number[]) {
   } finally {
     batchShipping.value = false;
   }
-  if (done) message.success(`${done} spedizioni inviate a Dinghuobao`);
+  if (done) message.success(`${done} spedizioni inviate al gestionale`);
   if (errors.length) {
     message.warning(`${errors.length} ordini non spediti — ${errors[0]}`);
   }
@@ -360,7 +360,7 @@ function runBatchShip() {
   if (!ids.length) return;
   Modal.confirm({
     title: 'Spedisci gli ordini selezionati',
-    content: `Verranno inviati a Dinghuobao ${ids.length === 1 ? '1 ordine' : `${ids.length} ordini`}. Gli ordini non in stato Da evadere o gia' spediti verranno rifiutati dal gestionale.`,
+    content: `Verranno inviati al gestionale ${ids.length === 1 ? '1 ordine' : `${ids.length} ordini`}. Gli ordini non in stato Da evadere o gia' spediti verranno rifiutati dal gestionale.`,
     okText: 'Spedisci',
     cancelText: 'Annulla',
     onOk: () => doBatchShip(ids),

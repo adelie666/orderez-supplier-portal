@@ -40,9 +40,9 @@ export class SyncController {
     return { suppliers, products };
   }
 
-  /** Importa le spedizioni registrate direttamente su Dinghuobao (getShipsList). */
+  /** Importa le spedizioni registrate direttamente sul gestionale (getShipsList). */
   /**
-   * Azzera tutti i dati di esercizio per collegare un altro gestionale Dinghuobao.
+   * Azzera tutti i dati di esercizio per collegare un altro gestionale.
    * Richiede una conferma esplicita: evita cancellazioni con un click sbagliato.
    */
   @Post('reset')

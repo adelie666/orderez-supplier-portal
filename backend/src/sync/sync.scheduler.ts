@@ -24,7 +24,7 @@ export class SyncScheduler {
   private async integrationReady(): Promise<boolean> {
     const ready = await this.sync.integrationReady();
     if (!ready && !this.warnedNoCredentials) {
-      this.logger.warn('Credenziali Dinghuobao non configurate: sincronizzazione automatica sospesa.');
+      this.logger.warn('Credenziali ERP non configurate: sincronizzazione automatica sospesa.');
       this.warnedNoCredentials = true;
     }
     if (ready) this.warnedNoCredentials = false;

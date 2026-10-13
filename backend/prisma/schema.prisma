@@ -60,7 +60,7 @@ model Product {
   purchasePrice    Decimal? @map("purchase_price") @db.Decimal(14, 4)
   baseUnits        String?  @map("base_units") @db.VarChar(32)
   conversionNumber Decimal? @map("conversion_number") @db.Decimal(14, 4)
-  // URL immagine articolo (Dinghuobao goods_picture, host img.dhb168.com)
+  // URL immagine articolo (goods_picture: percorso relativo sull'host immagini dell'ERP)
   imageUrl         String?  @map("image_url") @db.VarChar(512)
   raw              Json?
   syncedAt         DateTime @default(now()) @map("synced_at") @db.Timestamptz(3)
@@ -143,7 +143,7 @@ model Shipment {
   status      String   @default("receivedin") @db.VarChar(16) // receivedin | failed
   consignmentNo   String? @map("consignment_no") @db.VarChar(64)
   consignmentName String? @map("consignment_name") @db.VarChar(128)
-  // Nota del fornitore alla spedizione: viene inviata a Dinghuobao come consignmentRemark
+  // Nota del fornitore alla spedizione: viene inviata al gestionale come consignmentRemark
   remark          String? @db.VarChar(500)
   attempts    Int      @default(0) @db.SmallInt
   lastError   String?  @map("last_error")

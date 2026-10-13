@@ -1,7 +1,7 @@
 /**
  * 种子数据：
  *  1. 管理员账号（SEED_ADMIN_USERNAME / SEED_ADMIN_PASSWORD）
- *  2. 拉取一次供应商 / 商品 / 订单（需要已配置真实的订货宝凭证）
+ *  2. 拉取一次供应商 / 商品 / 订单（需要已配置真实的上游 ERP 凭证）
  *  3. 可选：给前 3 个供应商各开通一个演示账号（SEED_DEMO_SUPPLIERS=true 才执行）
  *
  * 运行：pnpm seed

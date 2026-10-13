@@ -34,7 +34,7 @@ export class DashboardService {
       this.prisma.shipment.count({
         where: { ...scope, status: 'receivedin', shippedAt: { gte: todayStart, lte: todayEnd } },
       }),
-      // Importo e quantita' venduti nel mese: dalle righe d'ordine Dinghuobao, non dalle
+      // Importo e quantita' venduti nel mese: dalle righe d'ordine dell'ERP, non dalle
       // spedizioni (le spedizioni esistono solo quando si spedisce dal portale).
       this.prisma.orderItem.aggregate({
         _sum: { actualAmount: true, ordersNumber: true },

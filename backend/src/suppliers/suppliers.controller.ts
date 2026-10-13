@@ -46,7 +46,7 @@ export class SuppliersController {
 
   /**
    * Mappatura articolo -> fornitore: accetta righe strutturate o testo incollato
-   * dall'esportazione della lista articoli di Dinghuobao.
+   * dall'esportazione della lista articoli dell'ERP.
    */
   @Post('goods-map')
   @Roles('admin')

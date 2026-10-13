@@ -24,7 +24,7 @@ export class ShipmentsController {
   }
 
   /** 发货（供应商与管理员均可，供应商限自己的单） */
-  /** 该订单在订货宝已有的出库（发货）单；用于解释为什么不能在这里发货 */
+  /** 该订单在上游 ERP 已有的出库（发货）单；用于解释为什么不能在这里发货 */
   @Get('orders/:id/erp-shipment')
   erpShipment(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: JwtPayload) {
     return this.shipments.erpShipment(id, user);

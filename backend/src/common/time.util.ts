@@ -1,15 +1,15 @@
 /**
  * 时间转换 —— 规划 §七
- * 存储一律 UTC；订货宝时间为北京时间（UTC+8）；展示/筛选为 Europe/Rome。
+ * 存储一律 UTC；上游 ERP 时间为北京时间（UTC+8）；展示/筛选为 Europe/Rome。
  */
 
-/** 订货宝北京时间字符串/时间戳 → UTC Date。 */
+/** 上游 ERP 北京时间字符串/时间戳 → UTC Date。 */
 export function beijingToUtc(input: string | number | Date | null | undefined): Date | null {
   if (input === null || input === undefined || input === '') return null;
   if (input instanceof Date) return new Date(input.getTime());
 
   if (typeof input === 'number') {
-    // 秒级时间戳（订货宝常见）
+    // 秒级时间戳（上游 ERP 常见）
     const ms = input < 1e11 ? input * 1000 : input;
     return new Date(ms);
   }
@@ -158,7 +158,7 @@ export function formatRomeDateTime(date: Date | string | null | undefined): stri
 export const ROME_TIMEZONE = ROME;
 
 /**
- * 把 UTC 时间格式化为订货宝要求的北京时间字符串（yyyy-MM-dd HH:mm:ss）。
+ * 把 UTC 时间格式化为上游 ERP 要求的北京时间字符串（yyyy-MM-dd HH:mm:ss）。
  * updateGe / updateLe / starttime / endtime 都按 G8（UTC+8）解析，无夏令时。
  */
 export function formatBeijing(date: Date | string | number | null | undefined): string {

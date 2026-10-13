@@ -24,7 +24,7 @@ const show = computed(() => !!props.src && !failed.value);
 
 <template>
   <span class="oe-thumb" :style="{ width: `${size}px`, height: `${size}px` }">
-    <!-- img.dhb168.com blocca l'hotlinking se arriva un Referer: va omesso.
+    <!-- Il server immagini dell'ERP blocca l'hotlinking se arriva un Referer: va omesso.
          referrerpolicy="no-referrer" e' obbligatorio, altrimenti l'immagine da 403. -->
     <img
       v-if="show"

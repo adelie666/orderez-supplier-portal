@@ -11,7 +11,7 @@ export class SuppliersService {
 
   /**
    * Importa la mappatura articolo -> fornitore.
-   * L'API ERP di Dinghuobao non espone il fornitore dell'articolo, quindi la mappatura
+   * L'API ERP non espone il fornitore dell'articolo, quindi la mappatura
    * arriva dall'esportazione della lista articoli; da qui gli ordini ereditano il fornitore.
    */
   async importGoodsMap(rows: Array<{ goodsNum?: unknown; supplierName?: unknown }>) {
@@ -26,7 +26,7 @@ export class SuppliersService {
       return { received: 0, updated: 0, ordersAssigned: 0, ordersCleared: 0, unknownSuppliers: [] as string[] };
     }
 
-    // Solo fornitori presenti in anagrafica (devono arrivare da Dinghuobao, non inventati in locale).
+    // Solo fornitori presenti in anagrafica (devono arrivare dal gestionale, non inventati in locale).
     const known = await this.prisma.supplier.findMany({ select: { supplierName: true } });
     const knownNames = new Set(known.map((row) => row.supplierName.trim()));
 
@@ -124,7 +124,7 @@ export class SuppliersService {
   async unmappedGoods(take = 200) {
     const limit = Math.min(Math.max(Number(take) || 200, 1), 1000);
     // Solo gli articoli che compaiono davvero in un ordine: sono quelli che bloccano
-    // l'assegnazione del fornitore. Il catalogo Dinghuobao contiene anche articoli
+    // l'assegnazione del fornitore. Il catalogo dell'ERP contiene anche articoli
     // di altre attivita' che non servono a questo portale.
     const rows = await this.prisma.$queryRaw<
       Array<{ goodsNum: string | null; goodsName: string | null; orders: bigint }>

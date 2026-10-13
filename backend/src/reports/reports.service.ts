@@ -113,7 +113,7 @@ export class ReportsService {
 
   /**
    * Righe del report.
-   * Fonte: righe d'ordine Dinghuobao (order_items + orders), filtrate per data ordine in ora
+   * Fonte: righe d'ordine dell'ERP (order_items + orders), filtrate per data ordine in ora
    * italiana. Gli ordini annullati sono esclusi: non sono merce da riconciliare.
    * Il report serve al fornitore e alla piattaforma per confrontare, in un periodo, quanto
    * di ogni articolo e' stato venduto e per quale importo.

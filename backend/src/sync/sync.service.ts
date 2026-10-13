@@ -19,7 +19,7 @@ const PAGE_SIZE = 100;
 const MAX_PAGES = 200;
 
 
-/** Campo personalizzato Dinghuobao risolto in anagrafica fornitori. */
+/** Campo personalizzato dell'ERP risolto in anagrafica fornitori. */
 interface SupplierResolution {
   fieldKey: string | null;
   index: SupplierIndex | null;
@@ -30,7 +30,7 @@ interface SupplierMatchStats {
   unmatched: Map<string, number>;
 }
 
-/** Esito dell'azzeramento dati per il passaggio a un altro gestionale Dinghuobao. */
+/** Esito dell'azzeramento dati per il passaggio a un altro gestionale. */
 export interface ResetDataResult {
   deleted: {
     shipments: number;
@@ -45,8 +45,8 @@ export interface ResetDataResult {
   };
 }
 
-/** Host pubblico delle immagini articolo di Dinghuobao (goods_picture e' un percorso relativo). */
-const ERP_IMAGE_BASE = 'https://img.dhb168.com/';
+/** Host pubblico delle immagini articolo dell'ERP (goods_picture e' un percorso relativo). */
+const ERP_IMAGE_BASE = `${(process.env.ERP_IMAGE_BASE_URL?.trim() || 'https://img.example.com').replace(/\/+$/, '')}/`;
 
 function productImageUrl(picture?: string | null): string | null {
   const path = picture?.trim();
@@ -101,7 +101,7 @@ export class SyncService implements OnApplicationBootstrap {
   private async assertRealIntegration(): Promise<void> {
     if (await this.gateway.isConfigured()) return;
     throw new BadRequestException(
-      'Credenziali Dinghuobao non configurate: configurare numero seriale e password prima di sincronizzare.',
+      'Credenziali ERP non configurate: configurare numero seriale e password prima di sincronizzare.',
     );
   }
 
@@ -231,7 +231,7 @@ export class SyncService implements OnApplicationBootstrap {
   /**
 
   /**
-   * Campo personalizzato Dinghuobao usato come fornitore + indice dell'anagrafica
+   * Campo personalizzato dell'ERP usato come fornitore + indice dell'anagrafica
    * fornitori per riconoscere i valori (per nome, numero cliente o id ERP).
    */
   private async supplierResolution(): Promise<SupplierResolution> {
@@ -296,7 +296,7 @@ export class SyncService implements OnApplicationBootstrap {
       await this.prisma.product.upsert({
         where: { erpGoodsId_erpOptionsId: { erpGoodsId, erpOptionsId } },
         create: data,
-        // Il fornitore dell'articolo e' la fonte di verita' Dinghuobao: se la sorgente non lo
+        // Il fornitore dell'articolo e' la fonte di verita' del gestionale: se la sorgente non lo
         // espone (campo fornitore vuoto) la colonna resta vuota, senza ereditare valori vecchi.
         update: {
           ...data,
@@ -397,8 +397,8 @@ export class SyncService implements OnApplicationBootstrap {
   // ------------------------------------------------------- 发货单同步（对账）
 
   /**
-   * 把订货宝的出库/发货单（getShipsList）导入本地 shipments / shipment_items。
-   * 门户只记录了自己点过发货的订单，直接在订货宝发货的单据此前完全不可见，
+   * 把上游 ERP 的出库/发货单（getShipsList）导入本地 shipments / shipment_items。
+   * 门户只记录了自己点过发货的订单，直接在上游 ERP 发货的单据此前完全不可见，
    * 这正是报表与首页热销商品为空的原因。
    */
   async syncShipments(options: { days?: number; from?: Date; to?: Date } = {}): Promise<{
@@ -459,7 +459,7 @@ export class SyncService implements OnApplicationBootstrap {
   }
 
   /**
-   * 根据订货宝发货单创建/更新本地发货单，并快照进货价。
+   * 根据上游 ERP 发货单创建/更新本地发货单，并快照进货价。
    * 金额口径与 ShipmentsService.finalize 一致：行金额 = 数量 × 进货价，HALF_UP 到 2 位。
    */
   private async materializeShipment(
@@ -510,7 +510,7 @@ export class SyncService implements OnApplicationBootstrap {
           const hit = products.find(
             (p) => p.erpGoodsId === (item.erpGoodsId ?? '') && p.erpOptionsId === (item.erpOptionsId ?? ''),
           );
-          // 订货宝的 purchase 字段常为 0（未维护进货价）→ 回退到订单行价格
+          // 上游 ERP 的 purchase 字段常为 0（未维护进货价）→ 回退到订单行价格
           const rawPrice = hit?.purchasePrice;
           const purchasePrice =
             rawPrice && Number(rawPrice) > 0 ? toDecimal(rawPrice) : toDecimal(item.ordersPrice ?? 0);
@@ -544,7 +544,7 @@ export class SyncService implements OnApplicationBootstrap {
     // 一次拿齐订单头 + 明细（getOrderContent）
     const { head, items } = await this.gateway.getOrderContent(raw);
 
-    // 订货宝 ERP 的销售订单明细不携带供应商字段（2026-10-08 实测），
+    // 上游 ERP 的销售订单明细不携带供应商字段，
     // 因此保持为 null；归属规则待业务方确认后再补映射。
     const supplierName = items.find((item) => item.supplier_name)?.supplier_name ?? null;
     const supplierId = supplierName ? await this.ensureSupplier(supplierName) : null;
@@ -587,7 +587,7 @@ export class SyncService implements OnApplicationBootstrap {
       update: data,
     });
 
-    // 明细整单重建，保持与订货宝一致
+    // 明细整单重建，保持与上游 ERP 一致
     await this.prisma.orderItem.deleteMany({ where: { orderId: order.id } });
     if (items.length) {
       await this.prisma.orderItem.createMany({
@@ -707,7 +707,7 @@ export class SyncService implements OnApplicationBootstrap {
   // ------------------------------------------------------------- reset dati
 
   /**
-   * Azzera i dati di esercizio per passare a un altro gestionale Dinghuobao
+   * Azzera i dati di esercizio per passare a un altro gestionale
    * (nuovo numero seriale + password).
    *
    * Le credenziali salvate NON vengono toccate: si aggiornano dalla pagina Integrazione.
@@ -748,7 +748,7 @@ export class SyncService implements OnApplicationBootstrap {
       `Dati azzerati: ${deleted.orders} ordini, ${deleted.products} articoli, ${deleted.suppliers} fornitori, ${deleted.accounts} account fornitore`,
     );
     // Il log va scritto dopo l'azzeramento, altrimenti verrebbe cancellato subito.
-    await this.log('product', 'ok', 'Dati azzerati per cambio gestionale Dinghuobao', deleted);
+    await this.log('product', 'ok', 'Dati azzerati per cambio gestionale', deleted);
     return { deleted };
   }
 

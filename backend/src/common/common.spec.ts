@@ -44,10 +44,10 @@ describe('time.util', () => {
   });
 });
 
-describe('ERP Dinghuobao', () => {
+describe('ERP', () => {
   it('usa lo stato di ritorno stockup (senza underscore), non stock_up', () => {
     expect(SHIPPABLE_STATUSES).toEqual(['stockup']);
-    // Non spedibile finche l'ordine non e approvato su Dinghuobao (ERP rifiuta con rStatus 204)
+    // Non spedibile finche l'ordine non e approvato sul gestionale (il gestionale rifiuta con rStatus 204)
     expect(SHIPPABLE_STATUSES).not.toContain('pending');
   });
 

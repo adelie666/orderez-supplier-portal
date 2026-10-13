@@ -166,7 +166,6 @@ npm run dev                 # http://127.0.0.1:5273，已代理 /api 到 :3100
 
 |    |                                                |
 | -- | ---------------------------------------------- |
-| 电话 | 18927528608                                    |
 | 邮箱 | <vip@adelieyun.com>                            |
 | 官网 | [www.adelieyun.com](https://www.adelieyun.com) |
 
